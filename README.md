@@ -1,15 +1,6 @@
 # Loan Eligibility Prediction
 This project aims to predict loan eligibility using machine learning models. The model is trained on historical loan data, and the prediction is exposed through a Flask API and a user-friendly Streamlit app. The system predicts whether an individual is eligible for a loan based on features like income, employment length, credit history, and loan-related attributes.
 
-# Project Structure
-
-loan-eligibility-prediction/
-├── app.py                           # Flask API to serve the model and make predictions
-├── AI_Predictive_Models_for_Credit_Underwriting.py # Additional module for credit underwriting models
-├── train_model.py                   # Script to train and save the loan eligibility prediction model
-├── loan_model.pkl                   # The trained machine learning model saved as a pickle file
-├── requirements.txt                 # Python dependencies for the project
-├── README.md                        # This file
 
 # Features
 Loan Eligibility Prediction: Predicts whether an individual is eligible for a loan based on features such as income, employment length, and credit score.
@@ -21,7 +12,7 @@ Streamlit App: A simple web interface that allows users to enter their details a
 To get started, clone the project repository to your local machine:
 
 
-Create a virtual environment and install the required dependencies:
+# Create a virtual environment and install the required dependencies:
 
 
 python -m venv venv
@@ -58,7 +49,6 @@ Method: POST
 # Request Body (JSON):
 
 json
-Copy code
 {
     "person_age": 22,
     "person_income": 59000,
@@ -72,7 +62,7 @@ Copy code
     "cb_person_default_on_file": "Y",
     "cb_person_cred_hist_length": 3
 }
-Response (JSON):
+# Response (JSON):
 
 json
 Copy code
@@ -80,27 +70,28 @@ Copy code
     "loan_eligibility": "Eligible"
 }
 # Files Overview
-train_model.py
+
+# train_model.py
 This script trains the machine learning model using the dataset. It handles missing values, performs data preprocessing, and trains a RandomForestClassifier. The trained model is saved as loan_model.pkl.
 
-app.py
+# app.py
 The Flask API that serves the loan eligibility model. It exposes a /predict endpoint that accepts POST requests containing user details and returns whether the user is eligible for a loan or not.
 
-AI_Predictive_Models_for_Credit_Underwriting.py
+# AI_Predictive_Models_for_Credit_Underwriting.py
 This additional file contains models and functionalities for predictive credit underwriting. It can be used to enhance the loan eligibility prediction process by incorporating more advanced credit scoring models.
 
-loan_model.pkl
+# loan_model.pkl
 This file contains the trained RandomForestClassifier model that is used by the API for making predictions.
 
-requirements.txt
+# requirements.txt
 This file lists all the Python libraries required to run the project. It includes libraries like Flask, Scikit-learn, pandas, and Streamlit.
 
-Dependencies
+# Dependencies
 To install the required dependencies, run the following command:
 
-bash
-Copy code
+
 pip install -r requirements.txt
+
 The required dependencies include:
 
 Flask
