@@ -65,7 +65,7 @@ json
 # Response (JSON):
 
 json
-Copy code
+
 {
     "loan_eligibility": "Eligible"
 }
