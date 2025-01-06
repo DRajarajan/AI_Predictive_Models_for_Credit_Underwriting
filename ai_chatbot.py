@@ -5,7 +5,7 @@ import pandas as pd
 from groq import Groq
 import os 
 
-client = Groq(api_key="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")
+client = Groq(api_key="Your api key")
 MODEL = 'llama3-groq-70b-8192-tool-use-preview'
 
 # Define valid options for categorical fields
