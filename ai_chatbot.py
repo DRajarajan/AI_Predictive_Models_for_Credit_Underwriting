@@ -5,7 +5,7 @@ import pandas as pd
 from groq import Groq
 import os 
 
-client = Groq(api_key="Your api key")
+client = Groq(api_key="your-grog-api-key-here")
 MODEL = 'llama3-groq-70b-8192-tool-use-preview'
 
 # Define valid options for categorical fields
@@ -23,7 +23,7 @@ def load_model():
         st.error(f"Error loading model: {str(e)}")
         return None
 
-def get_loan_eligibility(person_age, person_income, person_home_ownership, person_emp_length,
+def predict_default_risk(person_age, person_income, person_home_ownership, person_emp_length,
                         loan_intent, loan_grade, loan_amnt, loan_int_rate,
                         cb_person_default_on_file, cb_person_cred_hist_length, loan_percent_income):
     try:
@@ -48,18 +48,18 @@ def get_loan_eligibility(person_age, person_income, person_home_ownership, perso
         prediction = model.predict(user_input)[0]
         
         return {
-            "eligibility": bool(prediction),
+            "default_prediction": bool(prediction),
             "input_data": user_input.to_dict(orient='records')[0],
-            "message": "Eligible for loan" if prediction else "Not eligible for loan"
+            "message": "High Default Risk" if prediction else "Low Default Risk"
         }
     except Exception as e:
-        return {"error": f"Failed to process loan eligibility: {str(e)}"}
+        return {"error": f"Failed to process default risk prediction: {str(e)}"}
 
 def show():
-    st.title("🤖 Loan Prediction (GenAI Chatbot)")
+    st.title("🤖 Loan Default Risk Prediction (GenAI Chatbot)")
     st.markdown("""
-    Chat with our AI-powered chatbot to get personalized loan predictions. 
-    Answer all required questions to receive your loan eligibility assessment.
+    Chat with our AI-powered chatbot to assess loan default risk. 
+    Answer all required questions to receive your risk assessment.
     """)
 
     # Initialize session state
@@ -67,12 +67,12 @@ def show():
         st.session_state.messages = [
             {
                 "role": "system",
-                "content": """You are a loan eligibility assistant. Collect all required information one question at a time. 
+                "content": """You are a loan default risk assessment assistant. Collect all required information one question at a time. 
                 Do not make assumptions or fill in values. Ask for clarification if user input is unclear or invalid."""
             },
             {
                 "role": "assistant",
-                "content": "Hello! I'm your loan eligibility assistant. I'll help you check your loan eligibility by asking some questions. First, what is your age?"
+                "content": "Hello! I'm your loan default risk assessment assistant. I'll help evaluate the default risk by asking some questions. First, what is your age?"
             }
         ]
         st.session_state.collected_data = {}
@@ -101,7 +101,7 @@ def show():
                             st.session_state.collected_data = {}
                             st.session_state.current_field = 'person_age'
                             st.session_state.prediction_made = False
-                            response = "Great! Let's start a new loan eligibility check. What is your age?"
+                            response = "Great! Let's start a new default risk assessment. What is your age?"
                         else:
                             messages = [
                                 {"role": "system", "content": """You are a loan expert assistant. Answer questions about loans, 
@@ -216,27 +216,21 @@ def show():
                                 credit_history = int(prompt)
                                 if 0 <= credit_history <= 60:
                                     st.session_state.collected_data['cb_person_cred_hist_length'] = credit_history
-                                    st.session_state.current_field = 'loan_percent_income'
-                                    response = "What percentage of your income would this loan represent? (Enter a number between 0 and 100)"
-                                else:
-                                    response = "Please enter a valid credit history length between 0 and 60 years."
-                            except ValueError:
-                                response = "Please enter a valid number for credit history length."
-
-                        elif current_field == 'loan_percent_income':
-                            try:
-                                percent_income = float(prompt)
-                                if 0 <= percent_income <= 100:
-                                    st.session_state.collected_data['loan_percent_income'] = percent_income
+                                    
+                                    # Calculate loan_percent_income automatically
+                                    loan_amount = st.session_state.collected_data['loan_amnt']
+                                    income = st.session_state.collected_data['person_income']
+                                    loan_percent_income = (loan_amount / income) * 100
+                                    st.session_state.collected_data['loan_percent_income'] = loan_percent_income
                                     
                                     # Make prediction
-                                    result = get_loan_eligibility(**st.session_state.collected_data)
+                                    result = predict_default_risk(**st.session_state.collected_data)
                                     
                                     if "error" not in result:
                                         response = f"""
-                                        📊 **Loan Assessment Results**
+                                        📊 **Default Risk Assessment Results**
 
-                                        {'✅ Eligible for Loan' if result['eligibility'] else '❌ Not Eligible for Loan'}
+                                        {'🔴 High Default Risk' if result['default_prediction'] else '🟢 Low Default Risk'}
 
                                         ### **Personal Details:**
                                         - Age: {st.session_state.collected_data['person_age']} years
@@ -251,19 +245,19 @@ def show():
                                         - Loan Grade: {st.session_state.collected_data['loan_grade']}
 
                                         ### **Credit Details:**
-                                        - Credit Default on File: {'Yes' if st.session_state.collected_data['cb_person_default_on_file'] == 'Y' else 'No'}
+                                        - Prior Defaults: {'Yes' if st.session_state.collected_data['cb_person_default_on_file'] == 'Y' else 'No'}
                                         - Credit History Length: {st.session_state.collected_data['cb_person_cred_hist_length']} years
-                                        - Loan as % of Income: {st.session_state.collected_data['loan_percent_income']}%
+                                        - Loan as % of Income: {loan_percent_income:.1f}%
 
-                                        Would you like to check another loan scenario? Say 'yes' to start over, or feel free to ask any loan-related questions!
+                                        Would you like to assess another loan scenario? Say 'yes' to start over, or feel free to ask any loan-related questions!
                                         """
                                         st.session_state.prediction_made = True
                                     else:
                                         response = f"⚠️ Error: {result['error']}"
                                 else:
-                                    response = "Please enter a valid percentage between 0 and 100."
+                                    response = "Please enter a valid credit history length between 0 and 60 years."
                             except ValueError:
-                                response = "Please enter a valid number for loan percentage of income."
+                                response = "Please enter a valid number for credit history length."
 
                         else:
                             response = "An error occurred. Please start over."
