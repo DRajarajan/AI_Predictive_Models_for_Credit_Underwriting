@@ -3,8 +3,10 @@ import pickle
 import json
 import pandas as pd
 from groq import Groq
-import os 
+import os
 
+
+your-grog-api-key-here = st.secrets["GROQ_API_KEY"]
 client = Groq(api_key="your-grog-api-key-here")
 MODEL = 'llama3-groq-70b-8192-tool-use-preview'
 
