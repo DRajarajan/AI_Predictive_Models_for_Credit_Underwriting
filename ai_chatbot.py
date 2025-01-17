@@ -6,8 +6,8 @@ from groq import Groq
 import os
 
 
-your-grog-api-key-here == st.secrets["GROQ_API_KEY"]
-client = Groq(api_key="your-grog-api-key-here")
+api_key = st.secrets["GROQ_API_KEY"]
+client = Groq(api_key="api_key")
 MODEL = 'llama3-groq-70b-8192-tool-use-preview'
 
 # Define valid options for categorical fields
