@@ -6,7 +6,6 @@ from groq import Groq
 import os
 
 
-api_key = st.secrets["GROQ_API_KEY"]
 client = Groq(api_key="api_key")
 MODEL = 'llama3-groq-70b-8192-tool-use-preview'
 
